@@ -1,10 +1,12 @@
 // Modules to control application life and create native browser window
-const {app, Menu, BrowserWindow} = require('electron')
+const {app, Menu, BrowserWindow, Tray} = require('electron')
 const path = require('path')
+
+let mainWindow;
 
 function createWindow () {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -42,13 +44,17 @@ function createWindow () {
   ];
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
-  mainWindow.webContents.toggleDevTools();
 
   // and load the index.html of the app.
-  mainWindow.loadURL(baseURL)
+  mainWindow.loadURL(baseURL);
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools();
+
+  mainWindow.on('minimize', (event) => {
+    event.preventDefault();
+    mainWindow.hide();
+  });
 }
 
 // This method will be called when Electron has finished
@@ -62,6 +68,11 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+  tray = new Tray(path.join(__dirname, "../public/favicon.ico"));
+  tray.on('click', () => {
+    mainWindow.show();
+  })
+
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
