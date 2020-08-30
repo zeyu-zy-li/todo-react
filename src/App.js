@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Todo from "./components/Todo";
 import Form from "./components/Form";
 import FilterButton from "./components/FilterButton";
@@ -16,6 +16,16 @@ export default function App(props) {
   const filterButtons = FILTER_NAMES.map(name => (
     <FilterButton key={name} name={name} setFilter={setFilter} />
   ));
+
+
+  useEffect(() => {
+    if (window.ipcRenderer) {
+      window.ipcRenderer.on("filterChange", (event, message) => {
+        setFilter(message);
+      })
+    }
+  }, []);
+  
 
   // Tasks
   const [tasks, setTasks] = useState(props.tasks);
